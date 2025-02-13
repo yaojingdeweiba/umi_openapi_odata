@@ -1,0 +1,32 @@
+declare namespace {{ namespace }} {
+  {% for type in list -%}
+    {%- if type.props.length %}
+      {%- if type.isEnum %}
+        enum {{ type.typeName | safe }} 
+      {%- else %}
+        type {{ type.typeName | safe }} =
+      {%- endif %}
+      {%- for prop in type.props %}
+          {
+          {%- for p in prop %}
+            {%- if p.desc %}
+              /** {{ p.desc }} */
+            {%- endif %}
+            {%- if nullable %}
+              '{{ p.name }}': {{ p.type | safe }}{{'' if p.required else '| null'}};
+            {%- else %}
+              '{{ p.name }}'{{ '' if p.required else '?' }}: {{ p.type | safe }};
+            {%- endif %}
+          {%- endfor %}
+          }
+        {{ '' if loop.last === true else ' & '  }}
+      {%- endfor %}
+    {%- else %}
+      {%- if type.isEnum  %}
+        enum {{ type.typeName | safe }} {{ type.type }};
+      {%- else %}
+        type {{ type.typeName | safe }} = {{ type.type }};
+      {%- endif %}
+    {%- endif %}
+  {% endfor %}
+}
